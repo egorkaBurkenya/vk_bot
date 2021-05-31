@@ -3,6 +3,31 @@ import datetime
 
 from datetime import date, timedelta
 
+def verbal_definition_of_wind_force(speed: float) -> str:
+    if speed >= 0.0 or speed <= 0.2: return 'Штиль'
+    elif speed >= 0.3 or speed <= 1.5: return 'Тихий'
+    elif speed >= 1.6 or speed <= 3.3: return 'Лёгкий'
+    elif speed >= 3.4 or speed <= 5.4: return 'Слабый'
+    elif speed >= 5.5 or speed <= 7.9: return 'Умеренный'
+    elif speed >= 8.0 or speed <= 10.7: return 'Свежий'
+    elif speed >= 10.8 or speed <= 13.8: return 'Сильный'
+    elif speed >= 13.9 or speed <= 17.1: return 'Крепкий'
+    elif speed >= 17.2 or speed <= 20.7: return 'Очень крепкий'
+    elif speed >= 20.8 or speed <= 24.4: return 'Шторм'
+    elif speed >= 24.5 or speed <= 28.4: return 'Сильный шторм'
+    elif speed >= 28.5 or speed <= 32.6: return 'Жестокий шторм'
+    elif speed >= 33: return 'Ураган'
+
+def wind_direction(deg: float) -> str:
+    if deg >= 0.00 and deg <= 44.99: return 'северый'
+    if deg >= 45.00 and deg <= 89.99: return 'северо-восточный'
+    elif deg >= 90.00 and deg <= 134.99: return 'восточный'
+    elif deg >= 135.00 and deg <= 179.99: return 'юго-восточный'
+    elif deg >= 180.00 and deg <= 224.99: return 'югжный'
+    elif deg >= 225.00 and deg <= 269.99: return 'юго-западый'
+    elif deg >= 270.00 and deg <= 314.99: return 'западый'
+    elif deg >= 315.00: return 'северо-западый'
+
 def week_start_date(year, week):
 
     """

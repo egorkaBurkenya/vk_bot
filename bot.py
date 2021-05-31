@@ -132,6 +132,8 @@ def main():
                     with open('users.json', 'w') as file:
                         json.dump(users, file)                    
                     vk.messages.send(user_id = event.user_id, random_id = get_random_id(), message = f'Я запомнил, что ты из группы {event.text}')
+                else:
+                    vk.messages.send(user_id = event.user_id, random_id = get_random_id(), message = f'"{event.text}"\n\nНеизвестная команда')
 
 if __name__ == '__main__':
     main()
