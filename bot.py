@@ -1,8 +1,10 @@
+from logging import log
 import vk_api
 
 from vk_api.longpoll import VkLongPoll, VkEventType
 from vk_api.utils import get_random_id
 from vk_api.keyboard import VkKeyboard, VkKeyboardColor
+from vk_api import VkUpload
 
 import json
 import datetime
@@ -12,6 +14,7 @@ from bs import download_files
 from exel import parse_Table
 from utiles import today_table, tomorrow_table, this_week_table, next_week_table, week_day_table
 from weather import get_today_weather
+from corona import last_ten_days, reg_covid
 
 
 def get_groupes():
@@ -20,7 +23,7 @@ def get_groupes():
     groupes = []
     for groupe in table:
         groupes.append(groupe)
-    with open('groupes.json', 'w') as file:
+    with open('arrays.json', 'w') as file:
         json.dump({"groupes": groupes}, file)
 
 def main():
@@ -56,6 +59,8 @@ def main():
                     download_files()
                     vk.messages.send(user_id = event.user_id, random_id = get_random_id(), message = 'Файлы скачены, начинаю парсить Exel файлы...')
                     parse_Table()
+                    vk.messages.send(user_id = event.user_id, random_id = get_random_id(), message = 'Собираю список преподователей')
+                    find_teachers()
                     vk.messages.send(user_id = event.user_id, random_id = get_random_id(), message = 'Done 👀✅')
                     get_groupes()
                 except: 
@@ -93,7 +98,7 @@ def main():
                 # Если сообщение будет содержать слово бот и что-то еще 
 
                 arg = event.text.lower().split(' ')[1] # забирает аргумент 
-                with open('groupes.json', 'r') as file:
+                with open('arrays.json', 'r') as file:
                     groupes = json.load(file)["groupes"]
 
                 if arg in ['понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота']:
@@ -119,11 +124,22 @@ def main():
                     args = event.text.split(' ')
                     table = week_day_table(args[1].lower(), args[2])
                     vk.messages.send(user_id = event.user_id, random_id = get_random_id(), message = table)
+            elif event.text.lower() == 'корона':
+                status = last_ten_days()
+                upload = VkUpload(vk_session)
+                attachments = []
+                image = open('covid.png', 'rb')
+                photo = upload.photo_messages(photos = image.raw)[0]
+                attachments.append("photo{}_{}".format(photo["owner_id"], photo["id"]))
+                vk.messages.send(user_id = event.user_id, random_id = get_random_id(), message = status, attachment = ','.join(attachments))
+            elif 'корона' in event.text.lower() and len(event.text.lower().split(' ')) >= 2:
+                status = reg_covid(event.text.split(' ')[1])
+                vk.messages.send(user_id = event.user_id, random_id = get_random_id(), message = status)
             elif event.text.lower() == 'погода':
                 weather = get_today_weather()
                 vk.messages.send(user_id = event.user_id, random_id = get_random_id(), message = weather)
             else:
-                with open('groupes.json', 'r') as file:
+                with open('arrays.json', 'r') as file:
                     groupes = json.load(file)["groupes"]
                 if event.text in groupes:
                     with open('users.json', 'r') as file:
@@ -132,8 +148,6 @@ def main():
                     with open('users.json', 'w') as file:
                         json.dump(users, file)                    
                     vk.messages.send(user_id = event.user_id, random_id = get_random_id(), message = f'Я запомнил, что ты из группы {event.text}')
-                else:
-                    vk.messages.send(user_id = event.user_id, random_id = get_random_id(), message = f'"{event.text}"\n\nНеизвестная команда')
 
 if __name__ == '__main__':
     main()

@@ -2,7 +2,7 @@ import json
 import datetime
 
 from datetime import date, timedelta
-
+                        
 def verbal_definition_of_wind_force(speed: float) -> str:
     if speed >= 0.0 or speed <= 0.2: return 'Штиль'
     elif speed >= 0.3 or speed <= 1.5: return 'Тихий'
